@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Claire's Portfolio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500&family=Playfair+Display:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <header>
+    <div class="header-inner">
+      <span class="logo">Claire</span>
+      <nav>
+        <a href="#gallery">作品集</a>
+        <a href="mailto:claire30212@gmail.com">聯繫我</a>
+      </nav>
+    </div>
+  </header>
+
+  <section class="hero">
+    <h1>作品集</h1>
+    <p>記錄我建立的 AI 工具與專案</p>
+  </section>
+
+  <main>
+    <div class="filter-bar" id="filterBar"></div>
+
+    <section class="gallery" id="gallery">
+      <div class="loading">
+        <div class="spinner"></div>
+        <p>載入中…</p>
+      </div>
+    </section>
+
+    <div class="empty-state" id="emptyState" style="display:none;">
+      <p>目前還沒有公開的作品，請稍後再來 ✨</p>
+    </div>
+  </main>
+
+  <footer>
+    <p>© 2025 Claire &nbsp;·&nbsp; 以 Supabase + Notion 驅動</p>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
