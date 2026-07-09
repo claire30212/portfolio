@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1500 600" width="1500" height="600">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#EDE1F5"/>
+      <stop offset="55%" stop-color="#E4D4F0"/>
+      <stop offset="100%" stop-color="#D8C6E8"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="50%" cy="42%" r="55%">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.55"/>
+      <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="blur1"><feGaussianBlur stdDeviation="26"/></filter>
+    <filter id="blur2"><feGaussianBlur stdDeviation="14"/></filter>
+    <clipPath id="frame"><rect x="0" y="0" width="1500" height="600" rx="0"/></clipPath>
+  </defs>
+
+  <g clip-path="url(#frame)">
+    <rect width="1500" height="600" fill="url(#bg)"/>
+    <rect width="1500" height="600" fill="url(#glow)"/>
+
+    <!-- soft blurred Morandi blobs for depth -->
+    <circle cx="150" cy="90" r="130" fill="#C4B5D4" opacity="0.45" filter="url(#blur1)"/>
+    <circle cx="1360" cy="500" r="170" fill="#A8C4B8" opacity="0.35" filter="url(#blur1)"/>
+    <circle cx="1300" cy="80" r="110" fill="#E8A59B" opacity="0.30" filter="url(#blur1)"/>
+    <circle cx="120" cy="520" r="120" fill="#9BB5CC" opacity="0.30" filter="url(#blur1)"/>
+
+    <!-- twinkling star accents -->
+    <g fill="#F0C878" opacity="0.85">
+      <path filter="url(#blur2)" opacity="0.4" d="M230 130 l10 24 26 3 -19 18 5 26 -22 -14 -22 14 5 -26 -19 -18 26 -3 z"/>
+      <path d="M230 130 l7 17 18 2 -13 13 4 18 -16 -10 -16 10 4 -18 -13 -13 18 -2 z"/>
+      <path d="M1230 150 l6 14 15 2 -11 10 3 15 -13 -8 -13 8 3 -15 -11 -10 15 -2 z"/>
+      <path d="M1080 95 l5 11 12 1 -9 8 3 12 -11 -6 -11 6 3 -12 -9 -8 12 -1 z"/>
+      <path d="M420 90 l5 11 12 1 -9 8 3 12 -11 -6 -11 6 3 -12 -9 -8 12 -1 z"/>
+    </g>
+
+    <!-- floating sparkles -->
+    <text x="365" y="470" font-size="30" opacity="0.8">✨</text>
+    <text x="1120" y="480" font-size="26" opacity="0.75">✨</text>
+    <text x="750" y="88" font-size="24" opacity="0.7">⭐</text>
+
+    <!-- title -->
+    <text x="750" y="260" text-anchor="middle"
+      font-family="'Microsoft JhengHei','PingFang TC','Heiti TC','Noto Sans TC',sans-serif"
+      font-weight="700" font-size="108" fill="#4A3860" stroke="#FFFFFF" stroke-width="10" paint-order="stroke" letter-spacing="4">
+      集！點！LA！
+    </text>
+
+    <!-- subtitle -->
+    <text x="750" y="322" text-anchor="middle"
+      font-family="'Microsoft JhengHei','PingFang TC','Heiti TC','Noto Sans TC',sans-serif"
+      font-weight="500" font-size="34" fill="#6E5A82" letter-spacing="2">
+      親子積分成長系統
+    </text>
+
+    <!-- pet badges -->
+    <g>
+      <circle cx="560" cy="440" r="62" fill="#F5EEFB" stroke="#C4B5D4" stroke-width="3"/>
+      <text x="560" y="464" text-anchor="middle" font-size="58">🐱</text>
+    </g>
+    <g>
+      <circle cx="750" cy="452" r="70" fill="#FDF8F0" stroke="#E8A59B" stroke-width="3"/>
+      <text x="750" y="478" text-anchor="middle" font-size="66">🐰</text>
+    </g>
+    <g>
+      <circle cx="940" cy="440" r="62" fill="#F0F8F2" stroke="#A8C4B8" stroke-width="3"/>
+      <text x="940" y="464" text-anchor="middle" font-size="58">🦁</text>
+    </g>
+  </g>
+</svg>
