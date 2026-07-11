@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin 登入 · Claire's Portfolio</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500&family=Playfair+Display:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/admin-assets/admin.css">
+</head>
+<body class="login-body">
+  <form class="login-card" id="loginForm">
+    <h1>Claire</h1>
+    <p class="subtitle">作品集管理後台</p>
+    <input type="password" id="password" name="password" placeholder="密碼" autofocus required>
+    <button type="submit">登入</button>
+    <p class="error" id="error"></p>
+  </form>
+
+  <script>
+    const form = document.getElementById('loginForm');
+    const errorEl = document.getElementById('error');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      errorEl.textContent = '';
+      const password = document.getElementById('password').value;
+      try {
+        const res = await fetch('/admin/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ password })
+        });
+        const data = await res.json();
+        if (data.ok) {
+          window.location.href = '/admin';
+        } else {
+          errorEl.textContent = data.error || '登入失敗';
+        }
+      } catch (err) {
+        errorEl.textContent = '連線失敗：' + err.message;
+      }
+    });
+  </script>
+</body>
+</html>

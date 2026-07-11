@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin · Claire's Portfolio</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500&family=Playfair+Display:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/admin-assets/admin.css">
+</head>
+<body>
+  <header class="admin-header">
+    <span class="logo">Claire · Admin</span>
+    <button id="logoutBtn" class="btn-ghost">登出</button>
+  </header>
+
+  <main class="admin-main">
+    <section class="panel">
+      <div class="panel-head">
+        <h2>新增作品</h2>
+      </div>
+      <form id="createForm" class="item-form"></form>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head">
+        <h2>所有作品</h2>
+        <span id="itemCount" class="muted"></span>
+      </div>
+      <div id="itemList" class="item-list">
+        <p class="muted">載入中…</p>
+      </div>
+    </section>
+  </main>
+
+  <datalist id="platformOptions">
+    <option value="Claude Code">
+    <option value="Claude">
+    <option value="Gemini">
+    <option value="Canva">
+    <option value="個人密碼管理器">
+  </datalist>
+
+  <script src="/admin-assets/admin.js"></script>
+</body>
+</html>

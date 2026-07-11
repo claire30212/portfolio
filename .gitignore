@@ -1,2 +1,5 @@
 .env
 node_modules
+cookies.txt
+server-test.log
+*.log

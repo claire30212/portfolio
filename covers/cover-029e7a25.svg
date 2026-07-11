@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" width="1200" height="675">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#E7EEE8"/>
+      <stop offset="100%" stop-color="#D3E0D6"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="50%" cy="38%" r="60%">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.5"/>
+      <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="blur1"><feGaussianBlur stdDeviation="30"/></filter>
+  </defs>
+
+  <rect width="1200" height="675" fill="url(#bg)"/>
+  <rect width="1200" height="675" fill="url(#glow)"/>
+
+  <circle cx="110" cy="90" r="140" fill="#A8C4B8" opacity="0.4" filter="url(#blur1)"/>
+  <circle cx="1090" cy="590" r="170" fill="#9BAEBE" opacity="0.35" filter="url(#blur1)"/>
+
+  <circle cx="600" cy="300" r="90" fill="#FFFFFF" opacity="0.55"/>
+  <text x="600" y="335" text-anchor="middle"
+    font-family="'Playfair Display','Noto Sans TC',serif"
+    font-weight="600" font-size="88" fill="#3A4A3F">抽</text>
+
+  <text x="600" y="470" text-anchor="middle"
+    font-family="'Noto Sans TC',sans-serif"
+    font-weight="500" font-size="36" letter-spacing="1" fill="#3A4A3F">抽卡牌（心靈卡語）</text>
+</svg>

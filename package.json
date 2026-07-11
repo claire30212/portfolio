@@ -5,11 +5,14 @@
   "main": "notion-sync.js",
   "scripts": {
     "setup-db": "node setup-db.js",
-    "test": "node test.js"
+    "test": "node test.js",
+    "admin": "node server.js"
   },
   "dependencies": {
     "@notionhq/client": "^2.3.0",
     "@supabase/supabase-js": "^2.47.0",
-    "dotenv": "^16.4.0"
+    "dotenv": "^16.4.0",
+    "express": "^5.2.1",
+    "express-session": "^1.19.0"
   }
 }
