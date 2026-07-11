@@ -343,32 +343,38 @@ function resolveCategoryColor(tags = []) {
   return null;
 }
 
+// Rough single-line text width estimate: CJK/full-width glyphs are ~1em wide,
+// latin/digits/punctuation average ~0.58em.
+function estimateTextWidth(str, fontSize) {
+  let width = 0;
+  for (const ch of str) {
+    width += /[一-鿿　-〿＀-￯]/.test(ch) ? fontSize : fontSize * 0.58;
+  }
+  return width;
+}
+
 // The unified 1200x630 cover template used across the whole portfolio: a Morandi
-// gradient keyed to the item's tag category, fixed 48px white title, a small
-// platform label bottom-right, and semi-transparent white geometric/star accents.
+// gradient keyed to the item's tag category, a single-line white title (36px, or
+// 28px if it would otherwise overflow), a small platform label bottom-right, and
+// semi-transparent white circle/star accents.
 function generateUnifiedCoverSvg({ name, platform, primaryColor }) {
   const bgFrom = adjustLightness(primaryColor, 6);
   const bgTo = adjustLightness(primaryColor, -20);
-  const strokeColor = adjustLightness(primaryColor, -55);
 
-  const fontSize = 48;
-  const lineHeight = fontSize * 1.3;
-  const lines = wrapTitle(name, 18, 28).slice(0, 2);
-  const startY = 315 - ((lines.length - 1) * lineHeight) / 2 + fontSize * 0.35;
+  const maxTitleWidth = 1000;
+  const title = (name || '').trim();
+  const fontSize = estimateTextWidth(title, 36) <= maxTitleWidth ? 36 : 28;
+  const titleY = 315 + fontSize * 0.35;
 
-  const titleMarkup = lines
-    .map((line, i) => `
-  <text x="600" y="${(startY + i * lineHeight).toFixed(1)}" text-anchor="middle"
-    font-family="'Playfair Display','Noto Sans TC',sans-serif" font-weight="700"
-    font-size="${fontSize}" fill="#FFFFFF" stroke="${strokeColor}" stroke-width="${(fontSize * 0.1).toFixed(1)}"
-    paint-order="stroke" letter-spacing="1">${escapeXml(line)}</text>`)
-    .join('');
+  const titleMarkup = `
+  <text x="600" y="${titleY.toFixed(1)}" text-anchor="middle"
+    font-family="'Noto Sans TC',sans-serif" font-weight="500"
+    font-size="${fontSize}" fill="#FFFFFF" letter-spacing="1">${escapeXml(title)}</text>`;
 
   const platformMarkup = platform ? `
   <text x="1150" y="600" text-anchor="end"
-    font-family="'Noto Sans TC',sans-serif" font-weight="500" font-size="22"
-    fill="#FFFFFF" opacity="0.9" stroke="${strokeColor}" stroke-width="2.5"
-    paint-order="stroke" letter-spacing="1">${escapeXml(platform)}</text>` : '';
+    font-family="'Noto Sans TC',sans-serif" font-weight="500" font-size="12"
+    fill="#FFFFFF" letter-spacing="0.5">${escapeXml(platform)}</text>` : '';
 
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
   <defs>
