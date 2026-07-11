@@ -328,72 +328,59 @@ function generateDesignedCoverSvg({ name, primaryColor, decoration = 'stars' }) 
 </svg>`;
 }
 
-// Site-wide unified cover design: one Morandi primary color per tag category.
-const CATEGORY_COLORS = {
-  '身心靈': '#C5CDD8',
-  '生活小工具': '#D4B5A8',
-  '創作工具': '#A8B5A2',
-  '兒童學習': '#E8C9A8'
+// Site-wide unified cover design: one flat two-stop Morandi gradient per tag category.
+const CATEGORY_GRADIENTS = {
+  '身心靈': { from: '#C5CDD8', to: '#9BAEBE' },
+  '生活小工具': { from: '#D4B5A8', to: '#C4A090' },
+  '創作工具': { from: '#B8C4B8', to: '#A8B5A2' },
+  '兒童學習': { from: '#E8C9A8', to: '#D4B090' }
 };
+const OTHER_GRADIENT = { from: '#C5B8D8', to: '#9B8EB0' };
 
-function resolveCategoryColor(tags = []) {
-  for (const tag of Object.keys(CATEGORY_COLORS)) {
-    if ((tags || []).includes(tag)) return CATEGORY_COLORS[tag];
+function resolveCategoryGradient(tags = []) {
+  for (const tag of Object.keys(CATEGORY_GRADIENTS)) {
+    if ((tags || []).includes(tag)) return CATEGORY_GRADIENTS[tag];
   }
-  return null;
+  return OTHER_GRADIENT;
 }
 
-// Rough single-line text width estimate: CJK/full-width glyphs are ~1em wide,
-// latin/digits/punctuation average ~0.58em.
-function estimateTextWidth(str, fontSize) {
-  let width = 0;
-  for (const ch of str) {
-    width += /[一-鿿　-〿＀-￯]/.test(ch) ? fontSize : fontSize * 0.58;
-  }
-  return width;
-}
-
-// The unified 1200x630 cover template used across the whole portfolio: a Morandi
-// gradient keyed to the item's tag category, a single-line white title (36px, or
-// 28px if it would otherwise overflow), a small platform label bottom-right, and
-// semi-transparent white circle/star accents.
+// The unified 1200x630 cover template used across the whole portfolio: a same-hue
+// Morandi gradient keyed to the item's tag category, a centered single-line serif
+// title, a thin underline accent, a small platform label bottom-right, and two
+// semi-transparent white circles (different sizes) plus one star.
 // `displayName` lets a specific item show shortened text without changing its
 // underlying `name` (used for the storage filename / Notion lookup).
-function generateUnifiedCoverSvg({ name, displayName, platform, primaryColor, fontSize, fontWeight }) {
-  const bgFrom = adjustLightness(primaryColor, 6);
-  const bgTo = adjustLightness(primaryColor, -20);
-
-  const maxTitleWidth = 1000;
+function generateUnifiedCoverSvg({ name, displayName, platform, tags }) {
+  const gradient = resolveCategoryGradient(tags);
   const title = (displayName || name || '').trim();
-  const resolvedFontSize = fontSize || (estimateTextWidth(title, 36) <= maxTitleWidth ? 36 : 28);
-  const resolvedWeight = fontWeight || 500;
-  const titleY = 315 + resolvedFontSize * 0.35;
+  const fontSize = 28;
+  const titleY = 315 + fontSize * 0.35;
 
   const titleMarkup = `
   <text x="600" y="${titleY.toFixed(1)}" text-anchor="middle"
-    font-family="'Noto Sans TC',sans-serif" font-weight="${resolvedWeight}"
-    font-size="${resolvedFontSize}" fill="#FFFFFF" letter-spacing="1">${escapeXml(title)}</text>`;
+    font-family="Georgia,'Noto Serif TC',serif" font-weight="400"
+    font-size="${fontSize}" fill="#FFFFFF" letter-spacing="1">${escapeXml(title)}</text>`;
 
   const platformMarkup = platform ? `
   <text x="1150" y="600" text-anchor="end"
-    font-family="'Noto Sans TC',sans-serif" font-weight="500" font-size="12"
-    fill="#FFFFFF" letter-spacing="0.5">${escapeXml(platform)}</text>` : '';
+    font-family="'Noto Sans TC',sans-serif" font-weight="400" font-size="10"
+    fill="#FFFFFF" opacity="0.5" letter-spacing="0.5">${escapeXml(platform)}</text>` : '';
 
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
   <defs>
     <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="${bgFrom}"/>
-      <stop offset="100%" stop-color="${bgTo}"/>
+      <stop offset="0%" stop-color="${gradient.from}"/>
+      <stop offset="100%" stop-color="${gradient.to}"/>
     </linearGradient>
   </defs>
 
   <rect width="1200" height="630" fill="url(#bg)"/>
 
-  <circle cx="110" cy="100" r="80" fill="none" stroke="#FFFFFF" stroke-width="2.5" opacity="0.3"/>
-  <circle cx="1100" cy="110" r="30" fill="#FFFFFF" opacity="0.18"/>
-  <path d="${starPath(120, 520, 26)}" fill="#FFFFFF" opacity="0.28"/>
-  <circle cx="950" cy="500" r="50" fill="none" stroke="#FFFFFF" stroke-width="2.5" opacity="0.22"/>
-  <path d="${starPath(600, 68, 16)}" fill="#FFFFFF" opacity="0.32"/>
+  <circle cx="110" cy="100" r="90" fill="none" stroke="#FFFFFF" stroke-width="2" opacity="0.25"/>
+  <circle cx="1030" cy="500" r="46" fill="#FFFFFF" opacity="0.15"/>
+  <path d="${starPath(1080, 90, 20)}" fill="#FFFFFF" opacity="0.35"/>
+
+  <line x1="450" y1="380" x2="750" y2="380" stroke="#FFFFFF" stroke-width="0.5" opacity="0.3"/>
   ${titleMarkup}
   ${platformMarkup}
 </svg>`;
@@ -461,8 +448,8 @@ module.exports = {
   generateMorandiCoverSvg,
   generateDesignedCoverSvg,
   generateUnifiedCoverSvg,
-  resolveCategoryColor,
-  CATEGORY_COLORS,
+  resolveCategoryGradient,
+  CATEGORY_GRADIENTS,
   uploadSvgToStorage,
   isGeneratedCover,
   slugify,
