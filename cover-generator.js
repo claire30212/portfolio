@@ -1,9 +1,14 @@
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
+const { createClient } = require('@supabase/supabase-js');
 
 const SITE_BASE_URL = process.env.SITE_BASE_URL || 'https://claire30212.github.io/portfolio';
 const COVERS_DIR = path.join(__dirname, 'covers');
+const STORAGE_BUCKET = 'covers';
+
+// Storage writes need the service_role key (bypasses RLS) — server-side only, never expose to the browser.
+const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
 
 // Morandi palette pairs (background gradient) + matching blob accent colors.
 const PALETTES = [
@@ -51,6 +56,45 @@ async function fetchOgImage(url) {
     console.warn(`⚠ OG image fetch failed for ${url}: ${err.message}`);
     return null;
   }
+}
+
+// Screenshots the live site with a headless browser when no og:image is available.
+async function captureScreenshot(url) {
+  const puppeteer = require('puppeteer');
+  let browser;
+  try {
+    browser = await puppeteer.launch({ args: ['--no-sandbox', '--disable-setuid-sandbox'] });
+    const page = await browser.newPage();
+    await page.setViewport({ width: 1200, height: 675 });
+    await page.goto(url, { waitUntil: 'networkidle2', timeout: 20000 });
+    return await page.screenshot({ type: 'png' });
+  } catch (err) {
+    console.warn(`⚠ Screenshot failed for ${url}: ${err.message}`);
+    return null;
+  } finally {
+    if (browser) await browser.close();
+  }
+}
+
+async function uploadScreenshot(name, buffer) {
+  const filename = `${slugify(name)}.png`;
+  const { error } = await supabase.storage
+    .from(STORAGE_BUCKET)
+    .upload(filename, buffer, { contentType: 'image/png', upsert: true });
+
+  if (error) {
+    console.warn(`⚠ Supabase Storage upload failed for ${filename}: ${error.message}`);
+    return null;
+  }
+
+  const { data } = supabase.storage.from(STORAGE_BUCKET).getPublicUrl(filename);
+  return data.publicUrl;
+}
+
+async function captureAndUploadScreenshot(name, url) {
+  const buffer = await captureScreenshot(url);
+  if (!buffer) return null;
+  return uploadScreenshot(name, buffer);
 }
 
 function generateMorandiCoverSvg(name) {
@@ -108,19 +152,41 @@ function saveMorandiCover(name) {
   return `${SITE_BASE_URL}/covers/${filename}`;
 }
 
-// Resolves a cover image URL for a portfolio item:
+// True for covers produced by saveMorandiCover() (our generated fallback) — i.e. not a
+// real og:image, not a screenshot, and not a hand-made asset like covers/kids-points.svg.
+function isGeneratedCover(coverUrl) {
+  if (!coverUrl) return true;
+  if (!coverUrl.startsWith(`${SITE_BASE_URL}/covers/`)) return false;
+  return /-[0-9a-f]{8}\.svg$/i.test(coverUrl);
+}
+
+// Resolves a cover image URL for a portfolio item, in order:
 // 1. explicit coverUrl wins
 // 2. OG image scraped from the item's own url
-// 3. generated Morandi-style SVG, saved under covers/ and served via GitHub Pages
+// 3. headless-browser screenshot of the site, uploaded to Supabase Storage
+// 4. generated Morandi-style SVG, saved under covers/ and served via GitHub Pages
 async function resolveCoverUrl({ name, url, coverUrl }) {
   if (coverUrl) return coverUrl;
 
   if (url) {
     const og = await fetchOgImage(url);
     if (og) return og;
+
+    const screenshotUrl = await captureAndUploadScreenshot(name, url);
+    if (screenshotUrl) return screenshotUrl;
   }
 
   return saveMorandiCover(name);
 }
 
-module.exports = { resolveCoverUrl, fetchOgImage, saveMorandiCover, generateMorandiCoverSvg, slugify, SITE_BASE_URL };
+module.exports = {
+  resolveCoverUrl,
+  fetchOgImage,
+  captureScreenshot,
+  uploadScreenshot,
+  saveMorandiCover,
+  generateMorandiCoverSvg,
+  isGeneratedCover,
+  slugify,
+  SITE_BASE_URL
+};

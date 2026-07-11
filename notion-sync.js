@@ -1,7 +1,7 @@
 require('dotenv').config();
 const { Client } = require('@notionhq/client');
 const { createClient } = require('@supabase/supabase-js');
-const { resolveCoverUrl } = require('./cover-generator');
+const { resolveCoverUrl, isGeneratedCover } = require('./cover-generator');
 
 const notion = new Client({ auth: process.env.NOTION_TOKEN });
 // Server-side only: uses the service_role key so it bypasses RLS (needed for writes).
@@ -182,15 +182,18 @@ async function deletePortfolioItem(id) {
   return { id };
 }
 
-// Backfills cover_url for every item missing one, syncing the result to both
-// Supabase (cover_url) and Notion (page cover).
+// Backfills cover_url for every item that has no real cover yet — either missing
+// entirely or still using our generated Morandi SVG fallback (isGeneratedCover()).
+// Hand-made assets (e.g. covers/kids-points.svg) and real og:image/screenshot covers
+// are left untouched. Syncs the result to both Supabase (cover_url) and Notion (page cover).
 async function backfillMissingCovers() {
-  const { data: items, error } = await supabase
+  const { data: allItems, error } = await supabase
     .from('portfolio_items')
-    .select('*')
-    .or('cover_url.is.null,cover_url.eq.');
+    .select('*');
 
   if (error) throw new Error(`Supabase select failed: ${error.message}`);
+
+  const items = allItems.filter(item => isGeneratedCover(item.cover_url));
 
   const results = [];
   for (const item of items) {
