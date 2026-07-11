@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1500 600" width="1500" height="600">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F5F0EB"/>
+      <stop offset="55%" stop-color="#EDE2D3"/>
+      <stop offset="100%" stop-color="#E4D2BC"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="50%" cy="42%" r="55%">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.55"/>
+      <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="blur1"><feGaussianBlur stdDeviation="26"/></filter>
+    <filter id="blur2"><feGaussianBlur stdDeviation="14"/></filter>
+    <clipPath id="frame"><rect x="0" y="0" width="1500" height="600" rx="0"/></clipPath>
+  </defs>
+
+  <g clip-path="url(#frame)">
+    <rect width="1500" height="600" fill="url(#bg)"/>
+    <rect width="1500" height="600" fill="url(#glow)"/>
+
+    <!-- soft blurred Morandi blobs, one per element's colour -->
+    <circle cx="150" cy="90" r="130" fill="#8BA888" opacity="0.30" filter="url(#blur1)"/>
+    <circle cx="1360" cy="500" r="170" fill="#7A9AAA" opacity="0.28" filter="url(#blur1)"/>
+    <circle cx="1300" cy="80" r="110" fill="#C47A6A" opacity="0.28" filter="url(#blur1)"/>
+    <circle cx="120" cy="520" r="120" fill="#C4A55A" opacity="0.25" filter="url(#blur1)"/>
+    <circle cx="750" cy="560" r="100" fill="#D4C5A0" opacity="0.30" filter="url(#blur1)"/>
+
+    <!-- twinkling star accents -->
+    <g fill="#B8965A" opacity="0.8">
+      <path filter="url(#blur2)" opacity="0.4" d="M230 130 l10 24 26 3 -19 18 5 26 -22 -14 -22 14 5 -26 -19 -18 26 -3 z"/>
+      <path d="M230 130 l7 17 18 2 -13 13 4 18 -16 -10 -16 10 4 -18 -13 -13 18 -2 z"/>
+      <path d="M1230 150 l6 14 15 2 -11 10 3 15 -13 -8 -13 8 3 -15 -11 -10 15 -2 z"/>
+      <path d="M1080 95 l5 11 12 1 -9 8 3 12 -11 -6 -11 6 3 -12 -9 -8 12 -1 z"/>
+      <path d="M420 90 l5 11 12 1 -9 8 3 12 -11 -6 -11 6 3 -12 -9 -8 12 -1 z"/>
+    </g>
+
+    <!-- floating sparkles -->
+    <text x="365" y="470" font-size="30" opacity="0.7">✨</text>
+    <text x="1120" y="480" font-size="26" opacity="0.65">✨</text>
+    <text x="750" y="88" font-size="24" opacity="0.6">⭐</text>
+
+    <!-- title -->
+    <text x="750" y="248" text-anchor="middle"
+      font-family="'Microsoft JhengHei','PingFang TC','Heiti TC','Noto Sans TC',sans-serif"
+      font-weight="700" font-size="100" fill="#5C4A3A" stroke="#FFFFFF" stroke-width="10" paint-order="stroke" letter-spacing="6">
+      五行能量解析
+    </text>
+
+    <!-- subtitle -->
+    <text x="750" y="308" text-anchor="middle"
+      font-family="'Microsoft JhengHei','PingFang TC','Heiti TC','Noto Sans TC',sans-serif"
+      font-weight="500" font-size="30" fill="#8A7460" letter-spacing="2">
+      生辰八字 · 喜用神水晶推薦
+    </text>
+
+    <!-- five-element badges: 木火土金水 -->
+    <g font-family="'Microsoft JhengHei','PingFang TC','Heiti TC','Noto Sans TC',sans-serif" font-weight="700">
+      <g>
+        <circle cx="470" cy="450" r="56" fill="#EEF3ED" stroke="#8BA888" stroke-width="3"/>
+        <text x="470" y="472" text-anchor="middle" font-size="44" fill="#6C8A69">木</text>
+      </g>
+      <g>
+        <circle cx="610" cy="450" r="56" fill="#F8EEEC" stroke="#C47A6A" stroke-width="3"/>
+        <text x="610" y="472" text-anchor="middle" font-size="44" fill="#A5604F">火</text>
+      </g>
+      <g>
+        <circle cx="750" cy="450" r="62" fill="#F8F1E2" stroke="#C4A55A" stroke-width="3"/>
+        <text x="750" y="474" text-anchor="middle" font-size="48" fill="#9C7F3F">土</text>
+      </g>
+      <g>
+        <circle cx="890" cy="450" r="56" fill="#F7F3EA" stroke="#D4C5A0" stroke-width="3"/>
+        <text x="890" y="472" text-anchor="middle" font-size="44" fill="#A38F63">金</text>
+      </g>
+      <g>
+        <circle cx="1030" cy="450" r="56" fill="#EDF1F3" stroke="#7A9AAA" stroke-width="3"/>
+        <text x="1030" y="472" text-anchor="middle" font-size="44" fill="#5E7C8C">水</text>
+      </g>
+    </g>
+  </g>
+</svg>
