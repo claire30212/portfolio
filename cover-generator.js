@@ -210,7 +210,7 @@ function buildDesignedPalette(primaryHex) {
 
 // Wraps a title into up to 3 centered lines: word-wrap for latin text, character-chunking
 // (preferring breaks after punctuation) for CJK text which has no spaces.
-function wrapTitle(name, maxCharsPerLine = 11) {
+function wrapTitle(name, maxCharsPerLine = 11, maxLatinLineLen = 18) {
   const trimmed = (name || '').trim();
   if (/[a-zA-Z]/.test(trimmed) && trimmed.includes(' ')) {
     const words = trimmed.split(/\s+/);
@@ -218,7 +218,7 @@ function wrapTitle(name, maxCharsPerLine = 11) {
     let cur = '';
     for (const w of words) {
       const candidate = cur ? `${cur} ${w}` : w;
-      if (candidate.length > 18 && cur) {
+      if (candidate.length > maxLatinLineLen && cur) {
         lines.push(cur);
         cur = w;
       } else {
@@ -234,7 +234,8 @@ function wrapTitle(name, maxCharsPerLine = 11) {
   let cur = '';
   for (const ch of chars) {
     cur += ch;
-    if (cur.length >= maxCharsPerLine || /[，。？！：、]/.test(ch)) {
+    const atPunctuationBreak = cur.length >= maxCharsPerLine * 0.6 && /[，。？！：、]/.test(ch);
+    if (cur.length >= maxCharsPerLine || atPunctuationBreak) {
       lines.push(cur);
       cur = '';
     }
@@ -327,6 +328,68 @@ function generateDesignedCoverSvg({ name, primaryColor, decoration = 'stars' }) 
 </svg>`;
 }
 
+// Site-wide unified cover design: one Morandi primary color per tag category.
+const CATEGORY_COLORS = {
+  '身心靈': '#C5CDD8',
+  '生活小工具': '#D4B5A8',
+  '創作工具': '#A8B5A2',
+  '兒童學習': '#E8C9A8'
+};
+
+function resolveCategoryColor(tags = []) {
+  for (const tag of Object.keys(CATEGORY_COLORS)) {
+    if ((tags || []).includes(tag)) return CATEGORY_COLORS[tag];
+  }
+  return null;
+}
+
+// The unified 1200x630 cover template used across the whole portfolio: a Morandi
+// gradient keyed to the item's tag category, fixed 48px white title, a small
+// platform label bottom-right, and semi-transparent white geometric/star accents.
+function generateUnifiedCoverSvg({ name, platform, primaryColor }) {
+  const bgFrom = adjustLightness(primaryColor, 6);
+  const bgTo = adjustLightness(primaryColor, -20);
+  const strokeColor = adjustLightness(primaryColor, -55);
+
+  const fontSize = 48;
+  const lineHeight = fontSize * 1.3;
+  const lines = wrapTitle(name, 18, 28).slice(0, 2);
+  const startY = 315 - ((lines.length - 1) * lineHeight) / 2 + fontSize * 0.35;
+
+  const titleMarkup = lines
+    .map((line, i) => `
+  <text x="600" y="${(startY + i * lineHeight).toFixed(1)}" text-anchor="middle"
+    font-family="'Playfair Display','Noto Sans TC',sans-serif" font-weight="700"
+    font-size="${fontSize}" fill="#FFFFFF" stroke="${strokeColor}" stroke-width="${(fontSize * 0.1).toFixed(1)}"
+    paint-order="stroke" letter-spacing="1">${escapeXml(line)}</text>`)
+    .join('');
+
+  const platformMarkup = platform ? `
+  <text x="1150" y="600" text-anchor="end"
+    font-family="'Noto Sans TC',sans-serif" font-weight="500" font-size="22"
+    fill="#FFFFFF" opacity="0.9" stroke="${strokeColor}" stroke-width="2.5"
+    paint-order="stroke" letter-spacing="1">${escapeXml(platform)}</text>` : '';
+
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="${bgFrom}"/>
+      <stop offset="100%" stop-color="${bgTo}"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#bg)"/>
+
+  <circle cx="110" cy="100" r="80" fill="none" stroke="#FFFFFF" stroke-width="2.5" opacity="0.3"/>
+  <circle cx="1100" cy="110" r="30" fill="#FFFFFF" opacity="0.18"/>
+  <path d="${starPath(120, 520, 26)}" fill="#FFFFFF" opacity="0.28"/>
+  <circle cx="950" cy="500" r="50" fill="none" stroke="#FFFFFF" stroke-width="2.5" opacity="0.22"/>
+  <path d="${starPath(600, 68, 16)}" fill="#FFFFFF" opacity="0.32"/>
+  ${titleMarkup}
+  ${platformMarkup}
+</svg>`;
+}
+
 async function uploadSvgToStorage(name, svgText) {
   const filename = `${slugify(name)}.svg`;
   const { error } = await supabase.storage
@@ -385,6 +448,9 @@ module.exports = {
   saveMorandiCover,
   generateMorandiCoverSvg,
   generateDesignedCoverSvg,
+  generateUnifiedCoverSvg,
+  resolveCategoryColor,
+  CATEGORY_COLORS,
   uploadSvgToStorage,
   isGeneratedCover,
   slugify,
