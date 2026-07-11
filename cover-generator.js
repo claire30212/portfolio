@@ -353,7 +353,7 @@ function resolveCategoryGradient(tags = []) {
 function generateUnifiedCoverSvg({ name, displayName, platform, tags }) {
   const gradient = resolveCategoryGradient(tags);
   const title = (displayName || name || '').trim();
-  const fontSize = 28;
+  const fontSize = 38;
   const titleY = 315 + fontSize * 0.35;
 
   const titleMarkup = `
