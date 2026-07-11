@@ -357,19 +357,22 @@ function estimateTextWidth(str, fontSize) {
 // gradient keyed to the item's tag category, a single-line white title (36px, or
 // 28px if it would otherwise overflow), a small platform label bottom-right, and
 // semi-transparent white circle/star accents.
-function generateUnifiedCoverSvg({ name, platform, primaryColor }) {
+// `displayName` lets a specific item show shortened text without changing its
+// underlying `name` (used for the storage filename / Notion lookup).
+function generateUnifiedCoverSvg({ name, displayName, platform, primaryColor, fontSize, fontWeight }) {
   const bgFrom = adjustLightness(primaryColor, 6);
   const bgTo = adjustLightness(primaryColor, -20);
 
   const maxTitleWidth = 1000;
-  const title = (name || '').trim();
-  const fontSize = estimateTextWidth(title, 36) <= maxTitleWidth ? 36 : 28;
-  const titleY = 315 + fontSize * 0.35;
+  const title = (displayName || name || '').trim();
+  const resolvedFontSize = fontSize || (estimateTextWidth(title, 36) <= maxTitleWidth ? 36 : 28);
+  const resolvedWeight = fontWeight || 500;
+  const titleY = 315 + resolvedFontSize * 0.35;
 
   const titleMarkup = `
   <text x="600" y="${titleY.toFixed(1)}" text-anchor="middle"
-    font-family="'Noto Sans TC',sans-serif" font-weight="500"
-    font-size="${fontSize}" fill="#FFFFFF" letter-spacing="1">${escapeXml(title)}</text>`;
+    font-family="'Noto Sans TC',sans-serif" font-weight="${resolvedWeight}"
+    font-size="${resolvedFontSize}" fill="#FFFFFF" letter-spacing="1">${escapeXml(title)}</text>`;
 
   const platformMarkup = platform ? `
   <text x="1150" y="600" text-anchor="end"
@@ -400,14 +403,17 @@ async function uploadSvgToStorage(name, svgText) {
   const filename = `${slugify(name)}.svg`;
   const { error } = await supabase.storage
     .from(STORAGE_BUCKET)
-    .upload(filename, Buffer.from(svgText, 'utf8'), { contentType: 'image/svg+xml', upsert: true });
+    .upload(filename, Buffer.from(svgText, 'utf8'), { contentType: 'image/svg+xml', upsert: true, cacheControl: '60' });
 
   if (error) {
     console.warn(`⚠ Supabase Storage upload failed for ${filename}: ${error.message}`);
     return null;
   }
 
-  const { data } = supabase.storage.from(STORAGE_BUCKET).getPublicUrl(filename);
+  // Cache-bust: re-uploading to the same filename (upsert) can otherwise keep serving
+  // a stale cached copy at the same public URL for up to the previous cacheControl TTL.
+  const { data } = supabase.storage.from(STORAGE_BUCKET).getPublicUrl(filename, { download: false });
+  data.publicUrl += `?v=${Date.now()}`;
   return data.publicUrl;
 }
 
