@@ -17,8 +17,10 @@ if (!process.env.ADMIN_PASSWORD || !process.env.SESSION_SECRET) {
 }
 
 const app = express();
-const PORT = process.env.ADMIN_PORT || 3000;
+// Zeabur (and most PaaS) injects PORT at runtime; ADMIN_PORT stays as the local-dev override.
+const PORT = process.env.PORT || process.env.ADMIN_PORT || 3000;
 
+app.set('trust proxy', 1); // behind Zeabur's reverse proxy — needed for correct secure-cookie/protocol detection
 app.use(express.json());
 app.use(session({
   secret: process.env.SESSION_SECRET,
