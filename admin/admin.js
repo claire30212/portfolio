@@ -4,7 +4,7 @@ const createFormEl = document.getElementById('createForm');
 
 let items = [];
 
-const TOPIC_TAGS = ['Spiritual', 'Lifestyle', 'Creative', 'Kids', 'Entertainment', 'CélesteDestin'];
+const TOPIC_TAGS = ['CélesteDestin', 'Spiritual', 'Lifestyle', 'Creative', 'Kids'];
 
 async function api(path, options = {}) {
   const res = await fetch(path, {
@@ -21,10 +21,14 @@ async function api(path, options = {}) {
 }
 
 function fieldsMarkup(values = {}) {
-  const currentTopicTag = (values.tags || [])[0] || '';
+  const currentTopicTags = values.tags || [];
   const techTagsStr = (values.tech_tags || []).join(', ');
-  const topicOptions = TOPIC_TAGS
-    .map(t => `<option value="${escapeAttr(t)}" ${t === currentTopicTag ? 'selected' : ''}>${escapeHtml(t)}</option>`)
+  const topicCheckboxes = TOPIC_TAGS
+    .map(t => `
+      <label class="checkbox-row">
+        <input type="checkbox" name="topicTags" value="${escapeAttr(t)}" ${currentTopicTags.includes(t) ? 'checked' : ''}>
+        ${escapeHtml(t)}
+      </label>`)
     .join('');
   return `
     <label>作品名稱 *
@@ -36,9 +40,8 @@ function fieldsMarkup(values = {}) {
     <label>網址
       <input name="url" type="url" placeholder="https://" value="${escapeAttr(values.url || '')}">
     </label>
-    <label>主題標籤（篩選器用，僅一個）
-      <select name="topicTag">${topicOptions}</select>
-    </label>
+    <label>主題標籤（篩選器用，可複選）</label>
+    <div class="checkbox-group">${topicCheckboxes}</div>
     <label>技術標籤（逗號分隔，不顯示在篩選器）
       <input name="techTags" value="${escapeAttr(techTagsStr)}" placeholder="React, Supabase">
     </label>
@@ -61,12 +64,11 @@ function fieldsMarkup(values = {}) {
 
 function readForm(form) {
   const fd = new FormData(form);
-  const topicTag = (fd.get('topicTag') || '').trim();
   return {
     name: fd.get('name')?.trim(),
     description: fd.get('description')?.trim() || null,
     url: fd.get('url')?.trim() || null,
-    tags: topicTag ? [topicTag] : [],
+    tags: fd.getAll('topicTags'),
     techTags: (fd.get('techTags') || '').split(',').map(t => t.trim()).filter(Boolean),
     platform: fd.get('platform')?.trim() || null,
     coverUrl: fd.get('coverUrl')?.trim() || null,

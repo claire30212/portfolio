@@ -169,6 +169,14 @@ body {
 }
 .checkbox-row input { width: auto; }
 
+.checkbox-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  margin-top: -6px;
+}
+.checkbox-group .checkbox-row { font-size: .8rem !important; }
+
 .form-actions { display: flex; gap: 10px; }
 
 button { font-family: inherit; cursor: pointer; }

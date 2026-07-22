@@ -8,7 +8,7 @@ const db = createClient(SUPABASE_URL, SUPABASE_KEY);
 let allItems = [];
 let activeTag = null;
 
-const TAG_ORDER = ['CélesteDestin', 'Spiritual', 'Lifestyle', 'Creative', 'Kids', 'Entertainment'];
+const TAG_ORDER = ['CélesteDestin', 'Spiritual', 'Lifestyle', 'Creative', 'Kids'];
 
 async function loadPortfolio() {
   const gallery = document.getElementById('gallery');
@@ -112,14 +112,15 @@ function renderCards(items) {
       body.appendChild(desc);
     }
 
-    const topicTag = (item.tags || [])[0];
-    if (topicTag) {
+    if ((item.tags || []).length > 0) {
       const tagRow = document.createElement('div');
       tagRow.className = 'card-tags';
-      const span = document.createElement('span');
-      span.className = 'tag';
-      span.textContent = topicTag;
-      tagRow.appendChild(span);
+      item.tags.forEach(t => {
+        const span = document.createElement('span');
+        span.className = 'tag';
+        span.textContent = t;
+        tagRow.appendChild(span);
+      });
       body.appendChild(tagRow);
     }
 
