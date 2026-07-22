@@ -328,12 +328,14 @@ function generateDesignedCoverSvg({ name, primaryColor, decoration = 'stars' }) 
 </svg>`;
 }
 
-// Site-wide unified cover design: one flat two-stop Morandi gradient per tag category.
+// Site-wide unified cover design: one flat two-stop Morandi gradient per topic tag.
 const CATEGORY_GRADIENTS = {
-  '身心靈': { from: '#C5CDD8', to: '#9BAEBE' },
-  '生活小工具': { from: '#D4B5A8', to: '#C4A090' },
-  '創作工具': { from: '#B8C4B8', to: '#A8B5A2' },
-  '兒童學習': { from: '#E8C9A8', to: '#D4B090' }
+  'CélesteDestin': { from: '#C5B8D8', to: '#9B8EB0' },
+  'Spiritual': { from: '#C5CDD8', to: '#9BAEBE' },
+  'Lifestyle': { from: '#D4B5A8', to: '#C4A090' },
+  'Creative': { from: '#B8C4B8', to: '#A8B5A2' },
+  'Kids': { from: '#E8C9A8', to: '#D4B090' },
+  'Entertainment': { from: '#E8B8C4', to: '#D4909C' }
 };
 const OTHER_GRADIENT = { from: '#C5B8D8', to: '#9B8EB0' };
 

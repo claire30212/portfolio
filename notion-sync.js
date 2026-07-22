@@ -17,7 +17,7 @@ const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SER
 // 是否公開  (checkbox)
 // Date      (date)
 
-function buildNotionProperties({ name, description, url, tags = [], platform, isPublic }) {
+function buildNotionProperties({ name, description, url, tags = [], techTags = [], platform, isPublic }) {
   const properties = {
     '工具名稱': {
       title: [{ text: { content: name } }]
@@ -37,9 +37,12 @@ function buildNotionProperties({ name, description, url, tags = [], platform, is
       rich_text: url ? [{ text: { content: url } }] : []
     };
   }
-  if (tags !== undefined) {
+  if (tags !== undefined || techTags !== undefined) {
+    // Notion has no separate "filter tags" concept, so its multi-select keeps the
+    // full picture: the site's single topic tag plus all the tech/content tags.
+    const combined = [...(tags || []), ...(techTags || [])];
     properties['Multi-select'] = {
-      multi_select: (tags || []).map(t => ({ name: t }))
+      multi_select: combined.map(t => ({ name: t }))
     };
   }
   if (platform !== undefined) {
@@ -49,14 +52,14 @@ function buildNotionProperties({ name, description, url, tags = [], platform, is
   return properties;
 }
 
-async function addToPortfolio({ name, description, url, tags = [], platform, coverUrl, isPublic = true }) {
+async function addToPortfolio({ name, description, url, tags = [], techTags = [], platform, coverUrl, isPublic = true }) {
   // --- Resolve cover image: explicit > OG image from url > generated Morandi SVG ---
   const resolvedCoverUrl = await resolveCoverUrl({ name, url, coverUrl });
 
   // --- Notion ---
   const notionPayload = {
     parent: { database_id: process.env.NOTION_DATABASE_ID },
-    properties: buildNotionProperties({ name, description, url, tags, platform, isPublic }),
+    properties: buildNotionProperties({ name, description, url, tags, techTags, platform, isPublic }),
     cover: { external: { url: resolvedCoverUrl } }
   };
 
@@ -71,6 +74,7 @@ async function addToPortfolio({ name, description, url, tags = [], platform, cov
       description: description || null,
       url: url || null,
       tags,
+      tech_tags: techTags,
       platform: platform || null,
       notion_page_id: notionPage.id,
       cover_url: resolvedCoverUrl,
@@ -113,6 +117,7 @@ async function updatePortfolioItem(id, fields = {}, { regenerateCover = false } 
     description: fields.description !== undefined ? fields.description : existing.description,
     url: fields.url !== undefined ? fields.url : existing.url,
     tags: fields.tags !== undefined ? fields.tags : existing.tags,
+    techTags: fields.techTags !== undefined ? fields.techTags : existing.tech_tags,
     platform: fields.platform !== undefined ? fields.platform : existing.platform,
     isPublic: fields.isPublic !== undefined ? fields.isPublic : existing.is_public
   };
@@ -127,6 +132,7 @@ async function updatePortfolioItem(id, fields = {}, { regenerateCover = false } 
     description: merged.description || null,
     url: merged.url || null,
     tags: merged.tags || [],
+    tech_tags: merged.techTags || [],
     platform: merged.platform || null,
     cover_url: coverUrl || null,
     is_public: merged.isPublic
@@ -149,6 +155,7 @@ async function updatePortfolioItem(id, fields = {}, { regenerateCover = false } 
         description: merged.description,
         url: merged.url,
         tags: merged.tags,
+        techTags: merged.techTags,
         platform: merged.platform,
         isPublic: merged.isPublic
       }),

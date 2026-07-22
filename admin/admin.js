@@ -4,6 +4,8 @@ const createFormEl = document.getElementById('createForm');
 
 let items = [];
 
+const TOPIC_TAGS = ['Spiritual', 'Lifestyle', 'Creative', 'Kids', 'Entertainment', 'CélesteDestin'];
+
 async function api(path, options = {}) {
   const res = await fetch(path, {
     headers: { 'Content-Type': 'application/json' },
@@ -19,7 +21,11 @@ async function api(path, options = {}) {
 }
 
 function fieldsMarkup(values = {}) {
-  const tagsStr = (values.tags || []).join(', ');
+  const currentTopicTag = (values.tags || [])[0] || '';
+  const techTagsStr = (values.tech_tags || []).join(', ');
+  const topicOptions = TOPIC_TAGS
+    .map(t => `<option value="${escapeAttr(t)}" ${t === currentTopicTag ? 'selected' : ''}>${escapeHtml(t)}</option>`)
+    .join('');
   return `
     <label>作品名稱 *
       <input name="name" value="${escapeAttr(values.name || '')}" required>
@@ -30,8 +36,11 @@ function fieldsMarkup(values = {}) {
     <label>網址
       <input name="url" type="url" placeholder="https://" value="${escapeAttr(values.url || '')}">
     </label>
-    <label>標籤（逗號分隔）
-      <input name="tags" value="${escapeAttr(tagsStr)}" placeholder="React, Supabase">
+    <label>主題標籤（篩選器用，僅一個）
+      <select name="topicTag">${topicOptions}</select>
+    </label>
+    <label>技術標籤（逗號分隔，不顯示在篩選器）
+      <input name="techTags" value="${escapeAttr(techTagsStr)}" placeholder="React, Supabase">
     </label>
     <label>開發平台
       <input name="platform" list="platformOptions" value="${escapeAttr(values.platform || '')}">
@@ -52,11 +61,13 @@ function fieldsMarkup(values = {}) {
 
 function readForm(form) {
   const fd = new FormData(form);
+  const topicTag = (fd.get('topicTag') || '').trim();
   return {
     name: fd.get('name')?.trim(),
     description: fd.get('description')?.trim() || null,
     url: fd.get('url')?.trim() || null,
-    tags: (fd.get('tags') || '').split(',').map(t => t.trim()).filter(Boolean),
+    tags: topicTag ? [topicTag] : [],
+    techTags: (fd.get('techTags') || '').split(',').map(t => t.trim()).filter(Boolean),
     platform: fd.get('platform')?.trim() || null,
     coverUrl: fd.get('coverUrl')?.trim() || null,
     isPublic: fd.get('isPublic') === 'on'
@@ -159,7 +170,7 @@ function renderItemCard(item) {
       <div class="item-info">
         <h3>${escapeHtml(item.name)} ${item.is_public ? '' : '<span class="badge">未公開</span>'}</h3>
         <p class="muted">${escapeHtml(item.description || '')}</p>
-        <p class="muted small">${escapeHtml(item.platform || '')} ${(item.tags || []).map(t => `<span class="tag-pill">${escapeHtml(t)}</span>`).join(' ')}</p>
+        <p class="muted small">${escapeHtml(item.platform || '')} ${(item.tags || []).map(t => `<span class="tag-pill">${escapeHtml(t)}</span>`).join(' ')} ${(item.tech_tags || []).map(t => `<span class="tag-pill tech">${escapeHtml(t)}</span>`).join(' ')}</p>
       </div>
       <div class="item-actions">
         <button class="btn-ghost btn-edit">編輯</button>

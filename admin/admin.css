@@ -251,5 +251,10 @@ button { font-family: inherit; cursor: pointer; }
   color: var(--sage);
   font-size: .7rem;
 }
+.tag-pill.tech {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--muted);
+}
 
 .item-edit-form { margin-top: 16px; padding-top: 16px; border-top: 1px dashed var(--border); }

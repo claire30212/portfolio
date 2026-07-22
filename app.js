@@ -8,6 +8,8 @@ const db = createClient(SUPABASE_URL, SUPABASE_KEY);
 let allItems = [];
 let activeTag = null;
 
+const TAG_ORDER = ['CélesteDestin', 'Spiritual', 'Lifestyle', 'Creative', 'Kids', 'Entertainment'];
+
 async function loadPortfolio() {
   const gallery = document.getElementById('gallery');
   const emptyState = document.getElementById('emptyState');
@@ -42,17 +44,14 @@ async function loadPortfolio() {
 }
 
 function buildFilterBar(items) {
-  const allTags = new Set();
-  items.forEach(item => (item.tags || []).forEach(t => allTags.add(t)));
-
-  if (allTags.size === 0) return;
-
   const bar = document.getElementById('filterBar');
-  const allBtn = createFilterBtn('全部', null);
+  bar.innerHTML = '';
+
+  const allBtn = createFilterBtn('All', null);
   allBtn.classList.add('active');
   bar.appendChild(allBtn);
 
-  allTags.forEach(tag => bar.appendChild(createFilterBtn(tag, tag)));
+  TAG_ORDER.forEach(tag => bar.appendChild(createFilterBtn(tag, tag)));
 }
 
 function createFilterBtn(label, tag) {
@@ -113,15 +112,14 @@ function renderCards(items) {
       body.appendChild(desc);
     }
 
-    if ((item.tags || []).length > 0) {
+    const topicTag = (item.tags || [])[0];
+    if (topicTag) {
       const tagRow = document.createElement('div');
       tagRow.className = 'card-tags';
-      item.tags.forEach(t => {
-        const span = document.createElement('span');
-        span.className = 'tag';
-        span.textContent = t;
-        tagRow.appendChild(span);
-      });
+      const span = document.createElement('span');
+      span.className = 'tag';
+      span.textContent = topicTag;
+      tagRow.appendChild(span);
       body.appendChild(tagRow);
     }
 

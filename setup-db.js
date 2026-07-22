@@ -11,6 +11,7 @@ CREATE TABLE IF NOT EXISTS portfolio_items (
   description text,
   url         text,
   tags        text[],
+  tech_tags   text[],
   platform    text,
   notion_page_id text,
   cover_url   text,
